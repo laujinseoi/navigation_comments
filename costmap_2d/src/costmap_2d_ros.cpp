@@ -73,7 +73,7 @@ Costmap2DROS::Costmap2DROS(std::string name, tf::TransformListener& tf) :
 
   // get two frames
   private_nh.param("global_frame", global_frame_, std::string("/map"));
-  private_nh.param("robot_base_frame", robot_base_frame_, std::string("base_link"));
+  private_nh.param("robot_base_frame", robot_base_frame_, std::string("base_footprint"));
 
   // make sure that we set the frames appropriately based on the tf_prefix
   global_frame_ = tf::resolve(tf_prefix, global_frame_);
@@ -122,6 +122,7 @@ Costmap2DROS::Costmap2DROS(std::string name, tf::TransformListener& tf) :
       ROS_INFO("Using plugin \"%s\"", pname.c_str());
 
       boost::shared_ptr<Layer> plugin = plugin_loader_.createInstance(type);
+
       layered_costmap_->addPlugin(plugin);
       plugin->initialize(layered_costmap_, name + "/" + pname, &tf_);
     }

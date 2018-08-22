@@ -817,7 +817,7 @@ namespace navfn {
   //  2. Doesn't get near goal
   //  3. Surrounded by high potentials
   //
-
+  //路径计算函数
   int
     NavFn::calcPath(int n, int *st)
     {

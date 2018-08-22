@@ -121,7 +121,7 @@ public:
    * @param my The y coordinate of the cell
    * @param cost The cost to set the cell to
    */
-  void setCost(unsigned int mx, unsigned int my, unsigned char cost);
+  void clearRobotCell(unsigned int mx, unsigned int my, unsigned char cost);
 
   /**
    * @brief  Convert from map coordinates to world coordinates

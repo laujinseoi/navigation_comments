@@ -103,9 +103,9 @@ namespace carrot_planner {
       return false;
     }
 
+    //欧拉角度转换成四元素的方法
     tf::Stamped<tf::Pose> goal_tf;
     tf::Stamped<tf::Pose> start_tf;
-
     poseStampedMsgToTF(goal,goal_tf);
     poseStampedMsgToTF(start,start_tf);
 
@@ -145,6 +145,7 @@ namespace carrot_planner {
       target_y = start_y + scale * diff_y;
       target_yaw = angles::normalize_angle(start_yaw + scale * diff_yaw);
       
+      //不断更新目标点，直到发现目标点>0, 因为>0时说明目标点在障碍物中
       double footprint_cost = footprintCost(target_x, target_y, target_yaw);
       if(footprint_cost >= 0)
       {

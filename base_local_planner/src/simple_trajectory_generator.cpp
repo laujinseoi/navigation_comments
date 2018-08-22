@@ -256,6 +256,23 @@ Eigen::Vector3f SimpleTrajectoryGenerator::computeNewPositions(const Eigen::Vect
   new_pos[0] = pos[0] + (vel[0] * cos(pos[2]) + vel[1] * cos(M_PI_2 + pos[2])) * dt;
   new_pos[1] = pos[1] + (vel[0] * sin(pos[2]) + vel[1] * sin(M_PI_2 + pos[2])) * dt;
   new_pos[2] = pos[2] + vel[2] * dt;
+
+  /*
+   * 根据http://blog.csdn.net/heyijia0327/article/details/44983551博文求导的运动模型，当旋转速度不为零时
+   */
+//  if(fabs(vel[2] - 0) > 1e-3)
+//  {
+//    double r = hypot(vel[0], vel[1])/vel[2];
+//    new_pos[0] = pos[0] + r * (-sin(pos[2]) + sin(pos[2] + vel[2] * dt));
+//    new_pos[1] = pos[1] + r * (-cos(pos[2]) - cos(pos[2] + vel[2] * dt));
+//    new_pos[2] = pos[2] + vel[2] * dt;
+//  }
+//  else
+//  {
+//    new_pos[0] = pos[0] + (vel[0] * cos(pos[2]) + vel[1] * cos(M_PI_2 + pos[2])) * dt;
+//    new_pos[1] = pos[1] + (vel[0] * sin(pos[2]) + vel[1] * sin(M_PI_2 + pos[2])) * dt;
+//    new_pos[2] = pos[2] + vel[2] * dt;
+//  }
   return new_pos;
 }
 

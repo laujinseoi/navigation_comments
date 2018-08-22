@@ -216,7 +216,8 @@ namespace dwa_local_planner {
   bool DWAPlanner::checkTrajectory(
       Eigen::Vector3f pos,
       Eigen::Vector3f vel,
-      Eigen::Vector3f vel_samples){
+      Eigen::Vector3f vel_samples)
+  {
     oscillation_costs_.resetOscillationFlags();
     base_local_planner::Trajectory traj;
     geometry_msgs::PoseStamped goal_pose = global_plan_.back();
@@ -258,6 +259,7 @@ namespace dwa_local_planner {
     geometry_msgs::PoseStamped goal_pose = global_plan_.back();
 
     Eigen::Vector3f pos(global_pose.getOrigin().getX(), global_pose.getOrigin().getY(), tf::getYaw(global_pose.getRotation()));
+
     double sq_dist =
         (pos[0] - goal_pose.pose.position.x) * (pos[0] - goal_pose.pose.position.x) +
         (pos[1] - goal_pose.pose.position.y) * (pos[1] - goal_pose.pose.position.y);
@@ -292,19 +294,26 @@ namespace dwa_local_planner {
   /*
    * given the current state of the robot, find a good trajectory
    */
+  //根据机器人当前状态，返回最佳路径
   base_local_planner::Trajectory DWAPlanner::findBestPath(
       tf::Stamped<tf::Pose> global_pose,
       tf::Stamped<tf::Pose> global_vel,
       tf::Stamped<tf::Pose>& drive_velocities,
-      std::vector<geometry_msgs::Point> footprint_spec) {
+      std::vector<geometry_msgs::Point> footprint_spec)
+  {
 
+//    //作用是什么？
+//    //
     obstacle_costs_.setFootprint(footprint_spec);
 
     //make sure that our configuration doesn't change mid-run
     boost::mutex::scoped_lock l(configuration_mutex_);
 
+//    //机器人全局坐标值
     Eigen::Vector3f pos(global_pose.getOrigin().getX(), global_pose.getOrigin().getY(), tf::getYaw(global_pose.getRotation()));
+//    //机器人当前速度
     Eigen::Vector3f vel(global_vel.getOrigin().getX(), global_vel.getOrigin().getY(), tf::getYaw(global_vel.getRotation()));
+//    //从全局路径中提取目标点
     geometry_msgs::PoseStamped goal_pose = global_plan_.back();
     Eigen::Vector3f goal(goal_pose.pose.position.x, goal_pose.pose.position.y, tf::getYaw(goal_pose.pose.orientation));
     base_local_planner::LocalPlannerLimits limits = planner_util_->getCurrentLimits();
@@ -363,6 +372,9 @@ namespace dwa_local_planner {
     if (result_traj_.cost_ < 0) {
       drive_velocities.setIdentity();
     } else {
+      //利用矩阵来存储速度
+      //速度大小即为此刻到下一刻的偏移量
+      //转速大小为此刻到下一刻位置的偏转量
       tf::Vector3 start(result_traj_.xv_, result_traj_.yv_, 0);
       drive_velocities.setOrigin(start);
       tf::Matrix3x3 matrix;

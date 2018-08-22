@@ -194,7 +194,7 @@ unsigned char Costmap2D::getCost(unsigned int mx, unsigned int my) const
   return costmap_[getIndex(mx, my)];
 }
 
-void Costmap2D::setCost(unsigned int mx, unsigned int my, unsigned char cost)
+void Costmap2D::clearRobotCell(unsigned int mx, unsigned int my, unsigned char cost)
 {
   costmap_[getIndex(mx, my)] = cost;
 }

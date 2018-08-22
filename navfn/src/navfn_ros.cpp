@@ -179,7 +179,7 @@ namespace navfn {
     }
 
     //set the associated costs in the cost map to be free
-    costmap_->setCost(mx, my, costmap_2d::FREE_SPACE);
+    costmap_->clearRobotCell(mx, my, costmap_2d::FREE_SPACE);
   }
 
   bool NavfnROS::makePlanService(nav_msgs::GetPlan::Request& req, nav_msgs::GetPlan::Response& resp){

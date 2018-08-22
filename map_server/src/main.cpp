@@ -71,7 +71,8 @@ class MapServer
       ros::NodeHandle private_nh("~");
       private_nh.param("frame_id", frame_id, std::string("map"));
       deprecated = (res != 0);
-      if (!deprecated) {
+      if (!deprecated) //等于 res == 0
+      {
         //mapfname = fname + ".pgm";
         //std::ifstream fin((fname + ".yaml").c_str());
         std::ifstream fin(fname.c_str());
@@ -79,6 +80,8 @@ class MapServer
           ROS_ERROR("Map_server could not open %s.", fname.c_str());
           exit(-1);
         }
+
+        /**读取yaml文件**/
 #ifdef HAVE_YAMLCPP_GT_0_5_0
         // The document loading process changed in yaml-cpp 0.5.
         YAML::Node doc = YAML::Load(fin);
@@ -88,31 +91,35 @@ class MapServer
         parser.GetNextDocument(doc);
 #endif
         try {
-          doc["resolution"] >> res;
+          doc["resolution"] >> res; //分辨率
+          //if (doc["resolution"])
+          //{
+          //res = doc["resolution"].as<double>(); //也可按照此种方式进行赋值,但需要对doc["resolution"]的值是否有效进行检验
+          //}
         } catch (YAML::InvalidScalar) {
           ROS_ERROR("The map does not contain a resolution tag or it is invalid.");
           exit(-1);
         }
         try {
-          doc["negate"] >> negate;
+          doc["negate"] >> negate; //是否取反
         } catch (YAML::InvalidScalar) {
           ROS_ERROR("The map does not contain a negate tag or it is invalid.");
           exit(-1);
         }
         try {
-          doc["occupied_thresh"] >> occ_th;
+          doc["occupied_thresh"] >> occ_th; //占用空间阈值
         } catch (YAML::InvalidScalar) {
           ROS_ERROR("The map does not contain an occupied_thresh tag or it is invalid.");
           exit(-1);
         }
         try {
-          doc["free_thresh"] >> free_th;
+          doc["free_thresh"] >> free_th;  //自由空间阈值
         } catch (YAML::InvalidScalar) {
           ROS_ERROR("The map does not contain a free_thresh tag or it is invalid.");
           exit(-1);
         }
         try {
-          std::string modeS = "";
+          std::string modeS = ""; //地图模式
           doc["mode"] >> modeS;
 
           if(modeS=="trinary")
@@ -130,7 +137,7 @@ class MapServer
           mode = TRINARY;
         }
         try {
-          doc["origin"][0] >> origin[0];
+          doc["origin"][0] >> origin[0]; //获取地图原点
           doc["origin"][1] >> origin[1];
           doc["origin"][2] >> origin[2];
         } catch (YAML::InvalidScalar) {
@@ -138,7 +145,7 @@ class MapServer
           exit(-1);
         }
         try {
-          doc["image"] >> mapfname;
+          doc["image"] >> mapfname; //地图图片名称
           // TODO: make this path-handling more robust
           if(mapfname.size() == 0)
           {
@@ -156,7 +163,9 @@ class MapServer
           ROS_ERROR("The map does not contain an image tag or it is invalid.");
           exit(-1);
         }
-      } else {
+      }
+      else //已经被弃用的接口,则做一些初始化工作,一般需要给res赋值
+      {
         private_nh.param("negate", negate, 0);
         private_nh.param("occupied_thresh", occ_th, 0.65);
         private_nh.param("free_thresh", free_th, 0.196);
@@ -165,6 +174,7 @@ class MapServer
       }
 
       ROS_INFO("Loading map from image \"%s\"", mapfname.c_str());
+      //最主要的操作:从文件中加载地图
       map_server::loadMapFromFile(&map_resp_,mapfname.c_str(),res,negate,occ_th,free_th, origin, mode);
       map_resp_.map.info.map_load_time = ros::Time::now();
       map_resp_.map.header.frame_id = frame_id;

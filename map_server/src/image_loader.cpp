@@ -116,7 +116,7 @@ loadMapFromFile(nav_msgs::GetMap::Response* resp,
     for (i = 0; i < resp->map.info.width; i++)
     {
       // Compute mean of RGB for this pixel
-      p = pixels + j*rowstride + i*n_channels;
+      p = pixels + j*rowstride + i*n_channels;//指针位置
       color_sum = 0;
       for(k=0;k<avg_channels;k++)
         color_sum += *(p + (k));

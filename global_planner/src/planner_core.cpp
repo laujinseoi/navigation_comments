@@ -106,6 +106,7 @@ void GlobalPlanner::initialize(std::string name, costmap_2d::Costmap2D* costmap,
         else
             convert_offset_ = 0.0;
 
+        /*****定义costmap势力值计算方式*****/
         bool use_quadratic;
         private_nh.param("use_quadratic", use_quadratic, true);
         if (use_quadratic)
@@ -181,7 +182,7 @@ void GlobalPlanner::clearRobotCell(const tf::Stamped<tf::Pose>& global_pose, uns
     }
 
     //set the associated costs in the cost map to be free
-    costmap_->setCost(mx, my, costmap_2d::FREE_SPACE);
+    costmap_->clearRobotCell(mx, my, costmap_2d::FREE_SPACE);
 }
 
 bool GlobalPlanner::makePlanService(nav_msgs::GetPlan::Request& req, nav_msgs::GetPlan::Response& resp) {
@@ -295,6 +296,8 @@ bool GlobalPlanner::makePlan(const geometry_msgs::PoseStamped& start, const geom
 
     outlineMap(costmap_->getCharMap(), nx, ny, costmap_2d::LETHAL_OBSTACLE);
 
+    /*路径计算*/
+    //1.更新地图势力值
     bool found_legal = planner_->calculatePotentials(costmap_->getCharMap(), start_x, start_y, goal_x, goal_y,
                                                     nx * ny * 2, potential_array_);
 
@@ -303,6 +306,7 @@ bool GlobalPlanner::makePlan(const geometry_msgs::PoseStamped& start, const geom
     if(publish_potential_)
         publishPotential(potential_array_);
 
+    //2.求路径
     if (found_legal) {
         //extract the plan
         if (getPlanFromPotential(start_x, start_y, goal_x, goal_y, goal, plan)) {
@@ -317,6 +321,7 @@ bool GlobalPlanner::makePlan(const geometry_msgs::PoseStamped& start, const geom
         ROS_ERROR("Failed to get a plan.");
     }
 
+    //3.平滑路径
     // add orientations if needed
     orientation_filter_->processPath(start, plan);
     

@@ -170,7 +170,8 @@ namespace base_local_planner{
 
   //update what map cells are considered path based on the global_plan
   void MapGrid::setTargetCells(const costmap_2d::Costmap2D& costmap,
-      const std::vector<geometry_msgs::PoseStamped>& global_plan) {
+      const std::vector<geometry_msgs::PoseStamped>& global_plan)
+  {
     sizeCheck(costmap.getSizeInCellsX(), costmap.getSizeInCellsY());
 
     bool started_path = false;

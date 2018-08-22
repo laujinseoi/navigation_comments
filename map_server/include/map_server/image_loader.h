@@ -35,6 +35,8 @@
 
 #include "nav_msgs/GetMap.h"
 
+//地图模式
+//默认三元模式:
 /** Map mode
  *  Default: TRINARY -
  *      value >= occ_th - Occupied (100)

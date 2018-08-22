@@ -88,6 +88,7 @@ bool DijkstraExpansion::calculatePotentials(unsigned char* costs, double start_x
     nextEnd_ = 0;
     overBuffer_ = buffer3_;
     overEnd_ = 0;
+    //ns_表示栅格地图的总像素点数
     memset(pending_, 0, ns_ * sizeof(bool));
     std::fill(potential, potential + ns_, POT_HIGH);
 

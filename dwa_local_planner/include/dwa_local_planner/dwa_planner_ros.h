@@ -137,6 +137,7 @@ namespace dwa_local_planner {
 
       base_local_planner::LocalPlannerUtil planner_util_;
 
+      //路径规划器↓
       boost::shared_ptr<DWAPlanner> dp_; ///< @brief The trajectory controller
 
       costmap_2d::Costmap2DROS* costmap_ros_;

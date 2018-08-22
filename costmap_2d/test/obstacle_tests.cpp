@@ -131,7 +131,7 @@ TEST(costmap, testRaytracing2){
   // Fill in the diagonal, <7,7> and <9,9> already filled in, <0,0> is robot
   for(int i = 0; i < olayer->getSizeInCellsY(); ++i)
   {
-    olayer->setCost(i, i, LETHAL_OBSTACLE);
+    olayer->clearRobotCell(i, i, LETHAL_OBSTACLE);
   }
   // This will updateBounds, which will raytrace the static observation added
   // above, thus clearing out the diagonal again!

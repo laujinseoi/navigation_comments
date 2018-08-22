@@ -236,9 +236,12 @@ namespace base_local_planner{
 
     //compute the number of steps we must take along this trajectory to be "safe"
     int num_steps;
-    if(!heading_scoring_) {
+    if(!heading_scoring_) 
+    {
       num_steps = int(max((vmag * sim_time_) / sim_granularity_, fabs(vtheta_samp) / angular_sim_granularity_) + 0.5);
-    } else {
+    } 
+    else 
+    {
       num_steps = int(sim_time_ / sim_granularity_ + 0.5);
     }
 
@@ -317,15 +320,21 @@ namespace base_local_planner{
 
         // with heading scoring, we take into account heading diff, and also only score
         // path and goal distance for one point of the trajectory
-        if (heading_scoring_) {
-          if (time >= heading_scoring_timestep_ && time < heading_scoring_timestep_ + dt) {
+        //朝向设置，默认为false
+        if (heading_scoring_) 
+        {
+          if (time >= heading_scoring_timestep_ && time < heading_scoring_timestep_ + dt) 
+          {
             heading_diff = headingDiff(cell_x, cell_y, x_i, y_i, theta_i);
-          } else {
+          } 
+          else 
+          {
             update_path_and_goal_distances = false;
           }
         }
 
-        if (update_path_and_goal_distances) {
+        if (update_path_and_goal_distances) 
+        {
           //update path and goal distances
           path_dist = path_map_(cell_x, cell_y).target_dist;
           goal_dist = goal_map_(cell_x, cell_y).target_dist;
@@ -360,9 +369,12 @@ namespace base_local_planner{
 
     //ROS_INFO("OccCost: %f, vx: %.2f, vy: %.2f, vtheta: %.2f", occ_cost, vx_samp, vy_samp, vtheta_samp);
     double cost = -1.0;
-    if (!heading_scoring_) {
+    if (!heading_scoring_) 
+    {
       cost = pdist_scale_ * path_dist + goal_dist * gdist_scale_ + occdist_scale_ * occ_cost;
-    } else {
+    } 
+    else 
+    {
       cost = occdist_scale_ * occ_cost + pdist_scale_ * path_dist + 0.3 * heading_diff + goal_dist * gdist_scale_;
     }
     traj.cost_ = cost;
@@ -372,9 +384,12 @@ namespace base_local_planner{
     unsigned int goal_cell_x, goal_cell_y;
 
     // find a clear line of sight from the robot's cell to a farthest point on the path
-    for (int i = global_plan_.size() - 1; i >=0; --i) {
-      if (costmap_.worldToMap(global_plan_[i].pose.position.x, global_plan_[i].pose.position.y, goal_cell_x, goal_cell_y)) {
-        if (lineCost(cell_x, goal_cell_x, cell_y, goal_cell_y) >= 0) {
+    for (int i = global_plan_.size() - 1; i >=0; --i) 
+    {
+      if (costmap_.worldToMap(global_plan_[i].pose.position.x, global_plan_[i].pose.position.y, goal_cell_x, goal_cell_y)) 
+      {
+        if (lineCost(cell_x, goal_cell_x, cell_y, goal_cell_y) >= 0) 
+        {
           double gx, gy;
           costmap_.mapToWorld(goal_cell_x, goal_cell_y, gx, gy);
           return fabs(angles::shortest_angular_distance(heading, atan2(gy - y, gx - x)));
@@ -539,19 +554,23 @@ namespace base_local_planner{
     double max_vel_x = max_vel_x_, max_vel_theta;
     double min_vel_x, min_vel_theta;
 
-    if( final_goal_position_valid_ ){
+    if( final_goal_position_valid_ )
+    {
       double final_goal_dist = hypot( final_goal_x_ - x, final_goal_y_ - y );
       max_vel_x = min( max_vel_x, final_goal_dist / sim_time_ );
     }
 
-    //should we use the dynamic window approach?
-    if (dwa_) {
+    //是否采用DWA算法
+    if (dwa_)
+    {
       max_vel_x = max(min(max_vel_x, vx + acc_x * sim_period_), min_vel_x_);
       min_vel_x = max(min_vel_x_, vx - acc_x * sim_period_);
 
       max_vel_theta = min(max_vel_th_, vtheta + acc_theta * sim_period_);
       min_vel_theta = max(min_vel_th_, vtheta - acc_theta * sim_period_);
-    } else {
+    }
+    else
+    {
       max_vel_x = max(min(max_vel_x, vx + acc_x * sim_time_), min_vel_x_);
       min_vel_x = max(min_vel_x_, vx - acc_x * sim_time_);
 
@@ -560,7 +579,7 @@ namespace base_local_planner{
     }
 
 
-    //we want to sample the velocity space regularly
+    //按照参数中设置的进行均匀采样
     double dvx = (max_vel_x - min_vel_x) / (vx_samples_ - 1);
     double dvtheta = (max_vel_theta - min_vel_theta) / (vtheta_samples_ - 1);
 
@@ -580,16 +599,18 @@ namespace base_local_planner{
     //any cell with a cost greater than the size of the map is impossible
     double impossible_cost = path_map_.obstacleCosts();
 
-    //if we're performing an escape we won't allow moving forward
-    if (!escaping_) {
-      //loop through all x velocities
-      for(int i = 0; i < vx_samples_; ++i) {
+    //不在脱离状态下，
+    if (!escaping_) 
+    {
+      //采样(vx_samples+1) * vtheta_samples组采样数量
+      for(int i = 0; i < vx_samples_; ++i) 
+      {
         vtheta_samp = 0;
         //first sample the straight trajectory
         generateTrajectory(x, y, theta, vx, vy, vtheta, vx_samp, vy_samp, vtheta_samp,
             acc_x, acc_y, acc_theta, impossible_cost, *comp_traj);
 
-        //if the new trajectory is better... let's take it
+        //如果算出来的路径更好，那就拿最好的
         if(comp_traj->cost_ >= 0 && (comp_traj->cost_ < best_traj->cost_ || best_traj->cost_ < 0)){
           swap = best_traj;
           best_traj = comp_traj;
@@ -598,7 +619,8 @@ namespace base_local_planner{
 
         vtheta_samp = min_vel_theta;
         //next sample all theta trajectories
-        for(int j = 0; j < vtheta_samples_ - 1; ++j){
+        for(int j = 0; j < vtheta_samples_ - 1; ++j)
+        {
           generateTrajectory(x, y, theta, vx, vy, vtheta, vx_samp, vy_samp, vtheta_samp,
               acc_x, acc_y, acc_theta, impossible_cost, *comp_traj);
 
@@ -652,7 +674,9 @@ namespace base_local_planner{
     //let's try to rotate toward open space
     double heading_dist = DBL_MAX;
 
-    for(int i = 0; i < vtheta_samples_; ++i) {
+    //计算只旋转的路径
+    for(int i = 0; i < vtheta_samples_; ++i)
+    {
       //enforce a minimum rotational velocity because the base can't handle small in-place rotations
       double vtheta_samp_limited = vtheta_samp > 0 ? max(vtheta_samp, min_in_place_vel_th_)
         : min(vtheta_samp, -1.0 * min_in_place_vel_th_);
@@ -672,7 +696,8 @@ namespace base_local_planner{
         unsigned int cell_x, cell_y;
 
         //make sure that we'll be looking at a legal cell
-        if (costmap_.worldToMap(x_r, y_r, cell_x, cell_y)) {
+        if (costmap_.worldToMap(x_r, y_r, cell_x, cell_y))
+        {
           double ahead_gdist = goal_map_(cell_x, cell_y).target_dist;
           if (ahead_gdist < heading_dist) {
             //if we haven't already tried rotating left since we've moved forward
@@ -696,26 +721,36 @@ namespace base_local_planner{
       vtheta_samp += dvtheta;
     }
 
-    //do we have a legal trajectory
-    if (best_traj->cost_ >= 0) {
-      // avoid oscillations of in place rotation and in place strafing
-      if ( ! (best_traj->xv_ > 0)) {
-        if (best_traj->thetav_ < 0) {
-          if (rotating_right) {
+    //判断获得的路径是否合法
+    if (best_traj->cost_ >= 0)
+    {
+      // 避免震荡
+      if ( ! (best_traj->xv_ > 0))//如果xv<0
+      {
+        if (best_traj->thetav_ < 0) //且theta<0
+        {
+          if (rotating_right) //正在往右转
+          {
             stuck_right = true;
           }
           rotating_right = true;
-        } else if (best_traj->thetav_ > 0) {
-          if (rotating_left){
+        }
+        else if (best_traj->thetav_ > 0)
+        {
+          if (rotating_left)
+          {
             stuck_left = true;
           }
           rotating_left = true;
-        } else if(best_traj->yv_ > 0) {
+        }
+        else if(best_traj->yv_ > 0)
+        {
           if (strafe_right) {
             stuck_right_strafe = true;
           }
           strafe_right = true;
-        } else if(best_traj->yv_ < 0){
+        } else if(best_traj->yv_ < 0)
+        {
           if (strafe_left) {
             stuck_left_strafe = true;
           }

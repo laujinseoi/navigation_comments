@@ -437,7 +437,9 @@ namespace base_local_planner {
         rotating_to_goal_ = false;
         xy_tolerance_latch_ = false;
         reached_goal_ = true;
-      } else {
+      } 
+      else 
+      {
         //we need to call the next two lines to make sure that the trajectory
         //planner updates its path distance and goal distance grids
         tc_->updatePlan(transformed_plan);

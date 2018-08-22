@@ -14,7 +14,7 @@ void setValues(costmap_2d::Costmap2D& costmap, const unsigned char* map)
   int index = 0;
   for (int i = 0; i < costmap.getSizeInCellsY(); i++){
     for (int j = 0; j < costmap.getSizeInCellsX(); j++){
-      costmap.setCost(j, i, map[index]);
+      costmap.clearRobotCell(j, i, map[index]);
     }
   }
 }

@@ -331,9 +331,9 @@ void StaticLayer::updateCosts(costmap_2d::Costmap2D& master_grid, int min_i, int
         if (worldToMap(p.x(), p.y(), mx, my))
         {
           if (!use_maximum_)
-            master_grid.setCost(i, j, getCost(mx, my));
+            master_grid.clearRobotCell(i, j, getCost(mx, my));
           else
-            master_grid.setCost(i, j, std::max(getCost(mx, my), master_grid.getCost(i, j)));
+            master_grid.clearRobotCell(i, j, std::max(getCost(mx, my), master_grid.getCost(i, j)));
         }
       }
     }
