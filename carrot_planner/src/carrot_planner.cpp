@@ -131,6 +131,7 @@ namespace carrot_planner {
     double scale = 1.0;
     double dScale = 0.01;
 
+    //如果目标点在障碍物中，则不断往靠近起始点的位置移动目标点，直到目标点不在障碍物中
     while(!done)
     {
       if(scale < 0)
@@ -154,6 +155,8 @@ namespace carrot_planner {
       scale -=dScale;
     }
 
+    //只往规划的路径中添加了起始点和终点
+    //只需要终点就可以规划路径了？
     plan.push_back(start);
     geometry_msgs::PoseStamped new_goal = goal;
     tf::Quaternion goal_quat = tf::createQuaternionFromYaw(target_yaw);

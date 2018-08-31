@@ -58,6 +58,7 @@ bool AStarExpansion::calculatePotentials(unsigned char* costs, double start_x, d
 
     while (queue_.size() > 0 && cycle < cycles) {
         Index top = queue_[0];
+        //移动最大元素到结尾
         std::pop_heap(queue_.begin(), queue_.end(), greater1());
         queue_.pop_back();
 
@@ -65,10 +66,18 @@ bool AStarExpansion::calculatePotentials(unsigned char* costs, double start_x, d
         if (i == goal_i)
             return true;
 
-        add(costs, potential, potential[i], i + 1, end_x, end_y);
-        add(costs, potential, potential[i], i - 1, end_x, end_y);
-        add(costs, potential, potential[i], i + nx_, end_x, end_y);
-        add(costs, potential, potential[i], i - nx_, end_x, end_y);
+        //更新一个栅格上下左右的势能值
+        //--------------
+        //|   |i-nx|   |
+        //--------------
+        //|i-1| i  |i+1|
+        //--------------
+        //|   |i+nx|   |
+        //--------------
+        add(costs, potential, potential[i], i + 1, end_x, end_y);    //右
+        add(costs, potential, potential[i], i - 1, end_x, end_y);    //左
+        add(costs, potential, potential[i], i + nx_, end_x, end_y);  //下
+        add(costs, potential, potential[i], i - nx_, end_x, end_y);  //上
 
         cycle++;
     }

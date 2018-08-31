@@ -81,6 +81,7 @@ bool GradientPath::getPath(float* potential, double start_x, double start_y, dou
         // check if near goal
         double nx = stc % xs_ + dx, ny = stc / xs_ + dy;
 
+        //检查是否到达目标点
         if (fabs(nx - start_x) < .5 && fabs(ny - start_y) < .5) {
             current.first = start_x;
             current.second = start_y;
@@ -88,6 +89,7 @@ bool GradientPath::getPath(float* potential, double start_x, double start_y, dou
             return true;
         }
 
+        //边界检查
         if (stc < xs_ || stc > xs_ * ys_ - xs_) // would be out of bounds
         {
             printf("[PathCalc] Out of bounds\n");
@@ -113,49 +115,60 @@ bool GradientPath::getPath(float* potential, double start_x, double start_y, dou
         int stcpx = stc - xs_;
 
         // check for potentials at eight positions near cell
+        // stcpx 上一行x
+        // stcnx 下一行x
         if (potential[stc] >= POT_HIGH || potential[stc + 1] >= POT_HIGH || potential[stc - 1] >= POT_HIGH
                 || potential[stcnx] >= POT_HIGH || potential[stcnx + 1] >= POT_HIGH || potential[stcnx - 1] >= POT_HIGH
                 || potential[stcpx] >= POT_HIGH || potential[stcpx + 1] >= POT_HIGH || potential[stcpx - 1] >= POT_HIGH
                 || oscillation_detected) {
             ROS_DEBUG("[Path] Pot fn boundary, following grid (%0.1f/%d)", potential[stc], (int) path.size());
             // check eight neighbors to find the lowest
+            //从8邻格子里找到最低势能的
             int minc = stc;
             int minp = potential[stc];
+            //上左
             int st = stcpx - 1;
             if (potential[st] < minp) {
                 minp = potential[st];
                 minc = st;
             }
+            //上
             st++;
             if (potential[st] < minp) {
                 minp = potential[st];
                 minc = st;
             }
+            //上右
             st++;
             if (potential[st] < minp) {
                 minp = potential[st];
                 minc = st;
             }
+            //左
             st = stc - 1;
             if (potential[st] < minp) {
                 minp = potential[st];
                 minc = st;
             }
+            //右
             st = stc + 1;
             if (potential[st] < minp) {
                 minp = potential[st];
                 minc = st;
             }
+            //下左
             st = stcnx - 1;
             if (potential[st] < minp) {
                 minp = potential[st];
                 minc = st;
             }
+            //下
             st++;
             if (potential[st] < minp) {
                 minp = potential[st];
                 minc = st;
             }
+            //下右
             st++;
             if (potential[st] < minp) {
                 minp = potential[st];
@@ -167,7 +180,7 @@ bool GradientPath::getPath(float* potential, double start_x, double start_y, dou
 
             //ROS_DEBUG("[Path] Pot: %0.1f  pos: %0.1f,%0.1f",
             //    potential[stc], path[npath-1].first, path[npath-1].second);
-
+            //如果四面八方都是高障碍物，那么没办法了，找不到路径了
             if (potential[stc] >= POT_HIGH) {
                 ROS_DEBUG("[PathCalc] No path found, high potential");
                 //savemap("navfn_highpot");
@@ -176,8 +189,8 @@ bool GradientPath::getPath(float* potential, double start_x, double start_y, dou
         }
 
         // have a good gradient here
+        //如果四周的势能都是＜pot_high，那么则从格子的四个邻接格子选起
         else {
-
             // get grad at four positions near cell
             gradCell(potential, stc);
             gradCell(potential, stc + 1);
